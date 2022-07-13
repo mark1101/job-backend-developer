@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
+use Illuminate\Support\Facades\Request;
 
-class ProductService{
+class ProductService
+{
 
     private ProductRepository $repository;
 
@@ -15,8 +17,9 @@ class ProductService{
         $this->repository = $repo;
     }
 
-    public function insertService(array $data){
-        if(Product::where('name', $data['name'])->exists()){
+    public function insertService(array $data)
+    {
+        if (Product::where('name', $data['name'])->exists()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Produdo já existente na base de dados!'
@@ -25,16 +28,13 @@ class ProductService{
         return $this->repository->insert($data);
     }
 
-    public function updateService(array $data, Product $product){
+    public function updateService(array $data, Product $product)
+    {
         return $this->repository->update($data, $product->id);
     }
 
-    public function deleteService(Product $product){
+    public function deleteService(Product $product)
+    {
         return $this->repository->destroy($product->id);
     }
-
-    public function searchProduct(array $data){
-        
-    }
-
 }

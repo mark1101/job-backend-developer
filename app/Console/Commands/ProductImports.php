@@ -31,32 +31,32 @@ class ProductImports extends Command
      */
     public function handle()
     {
-        $data = Http::get('https://fakestoreapi.com/products/');
+        $data = Http::get('https://fakestoreapi.com/products/'.$this->option('id'));
 
-        if($data->failed()){
+        if ($data->failed()) {
             $this->message = 'Erro ao buscar data na API';
-        }else{
+        } else {
             $response = $data->object();
         }
 
-        if('?' == $this->option('id')){
-            foreach($response as $item){
-                if(!Product::where('name' , $item->title)->exist()){
+        if ('?' == $this->option('id')) {
+            foreach ($response as $item) {
+                if (!Product::where('name', $item->title)->exists()) {
                     $value = $this->itemTransform($item);
                     (new ProductRepository())->insert($value);
                 }
             }
-
-            $this->message = 'Produtos cadastrados com sucesso!';
+            $this->message = 'Os produtos foram cadastrados com sucesso';
             return 1;
         }
         $value = $this->itemTransform(json_decode($data->body()));
         (new ProductRepository())->insert($value);
-        $this->message = 'Produco cadastrado com sucesso!';
-        return 0;
+        $this->message = 'Produto cadastrado com sucesso';
+        return 1;
     }
 
-    public function itemTransform(object $data){
+    public function itemTransform(object $data)
+    {
         $newProd = [];
         $newProd['name'] = $data->title;
         $newProd['description'] = $data->description;

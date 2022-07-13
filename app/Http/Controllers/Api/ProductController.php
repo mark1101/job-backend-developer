@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\SearchProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\ProductService;
+use Illuminate\Support\Facades\Request;
 
 class ProductController extends Controller
 {
@@ -22,10 +24,18 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(SearchProductRequest $request)
     {
-        $products = Product::all();
-        return response()->json($products);
+        return ProductResource::collection(
+            Product::when($request->get('name'), function ($query) use ($request) {
+                $query->where('name',  $request->get('name'))
+                    ->where('category', $request->get('category'));
+            })
+                ->when($request->get('category'), function ($query) use ($request) {
+                    $query->where('category', 'LIKE', $request->get('category'));
+                })
+                ->get()
+        );
     }
 
     /**
